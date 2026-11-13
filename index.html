@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal SSOMA - COSAPI | Cero Accidentes con Integridad</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Librería QRCode.js para generación real de códigos QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        cosapi: {
+                            blue: '#0095D9',
+                            dark: '#005A8C',
+                            light: '#E6F5FC',
+                            red: '#E32629',
+                            gray: '#4D4D4F',
+                            metal: '#A7A9AC',
+                            bg: '#F4F7FA'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ajustes para asegurar que los QR generados por qrcodejs se adapten perfectamente */
+        .qr-container img, .qr-container canvas {
+            margin: 0 auto;
+            display: block;
+            border-radius: 6px;
+        }
+        /* Animación suave para notificaciones */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideUp 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-cosapi-bg text-cosapi-gray min-h-screen flex flex-col antialiased selection:bg-cosapi-blue selection:text-white">
+
+    <!-- ENCABEZADO CORPORATIVO -->
+    <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-30">
+        <!-- Franja superior institucional -->
+        <div class="bg-gradient-to-r from-cosapi-dark via-cosapi-blue to-cosapi-dark h-1.5 w-full"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- Bloque Izquierdo: Logo COSAPI + Título Portal -->
+                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+                    <!-- SVG Logo Oficial COSAPI -->
+                    <div class="flex items-center" title="COSAPI - Ingeniería y Construcción">
+                        <svg class="h-10 sm:h-12 w-auto" viewBox="0 0 280 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="cosapiRingGrad" x1="215" y1="12" x2="215" y2="78" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#0095D9" />
+                                    <stop offset="50%" stop-color="#75C5F0" />
+                                    <stop offset="100%" stop-color="#E1F2FB" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Texto COSAPI -->
+                            <text x="8" y="57" fill="#0095D9" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="38" letter-spacing="-1">COSAPI</text>
+                            <!-- Anillo degradado característico -->
+                            <path d="M 248 41 A 32 32 0 1 0 248 49" stroke="url(#cosapiRingGrad)" stroke-width="8.5" stroke-linecap="round" fill="none" />
+                        </svg>
+                    </div>
+
+                    <div class="hidden sm:block h-8 w-px bg-gray-200"></div>
+
+                    <div class="text-right md:text-left">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cosapi-light text-cosapi-dark">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cosapi-blue animate-pulse"></span>
+                            Gestión SSOMA
+                        </span>
+                        <h1 class="text-base sm:text-lg font-bold text-gray-800 leading-tight mt-0.5">
+                            Centro de Formularios Digitales
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Bloque Derecho: Emblema CERO ACCIDENTES con INTEGRIDAD -->
+                <div class="flex items-center gap-3 bg-gray-50/80 px-3.5 py-1.5 rounded-xl border border-gray-100">
+                    <!-- SVG Emblema "Nuestra meta CERO ACCIDENTES con INTEGRIDAD" -->
+                    <svg class="h-14 sm:h-16 w-auto" viewBox="0 0 220 215" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Nuestra meta CERO ACCIDENTES con INTEGRIDAD">
+                        <defs>
+                            <!-- Arco para texto superior -->
+                            <path id="topArc" d="M 32,92 A 82,82 0 0,1 188,92" />
+                        </defs>
+                        
+                        <!-- Texto curvo superior: Nuestra meta -->
+                        <text fill="#0095D9" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="20" letter-spacing="0.5">
+                            <textPath href="#topArc" startOffset="50%" text-anchor="middle">Nuestra meta</textPath>
+                        </text>
+
+                        <!-- Domo del Casco (gris claro) -->
+                        <path d="M 48 112 C 48 68, 172 68, 172 112 Z" fill="#E6E7E8" />
+                        
+                        <!-- Tres franjas verticales del casco (gris metálico) -->
+                        <rect x="80" y="64" width="14" height="48" rx="7" fill="#A7A9AC" />
+                        <rect x="103" y="57" width="14" height="55" rx="7" fill="#A7A9AC" />
+                        <rect x="126" y="64" width="14" height="48" rx="7" fill="#A7A9AC" />
+                        
+                        <!-- Visera/Borde horizontal del casco -->
+                        <rect x="38" y="107" width="144" height="10" rx="5" fill="#A7A9AC" />
+
+                        <!-- Texto CERO (0 en Rojo Corporativo #E32629) -->
+                        <text x="110" y="160" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="48" letter-spacing="-1">
+                            <tspan fill="#0095D9">CER</tspan><tspan fill="#E32629">O</tspan>
+                        </text>
+
+                        <!-- Texto ACCIDENTES -->
+                        <text x="110" y="185" text-anchor="middle" fill="#0095D9" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="22" letter-spacing="0.5">
+                            ACCIDENTES
+                        </text>
+
+                        <!-- Texto con INTEGRIDAD -->
+                        <text x="110" y="205" text-anchor="middle" fill="#4D4D4F" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="16.5">
+                            <tspan font-weight="600">con </tspan><tspan font-weight="800">INTEGRIDAD</tspan>
+                        </text>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- Barra de Herramientas: Búsqueda y Botón Agregar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-4 sm:p-5 mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                <!-- Buscador -->
+                <div class="relative flex-grow max-w-xl">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Buscar formulario por título, apartado o descripción..." 
+                        class="w-full pl-11 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-cosapi-blue focus:ring-2 focus:ring-cosapi-blue/20 transition-all"
+                    >
+                    <button id="clearSearchBtn" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Acciones principales -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <button 
+                        onclick="openFormModal()" 
+                        class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-cosapi-blue hover:bg-cosapi-dark text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition-all cursor-pointer"
+                    >
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Agregar Formulario / QR</span>
+                    </button>
+
+                    <button 
+                        onclick="confirmResetDefaults()" 
+                        title="Restaurar los 6 formularios originales"
+                        class="inline-flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-xs sm:text-sm px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                    >
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Restaurar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestañas / Filtros por Apartado -->
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-2 overflow-x-auto pb-1">
+                <div id="categoryTabs" class="flex items-center gap-2">
+                    <!-- Generado dinámicamente por JS -->
+                </div>
+                <div class="text-xs text-gray-500 font-medium whitespace-nowrap pl-2">
+                    Mostrando <span id="visibleCount" class="font-bold text-cosapi-dark">0</span> formularios
+                </div>
+            </div>
+        </div>
+
+        <!-- Cuadrícula de Tarjetas de Formularios -->
+        <div id="formsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Las tarjetas se renderizan aquí dinámicamente -->
+        </div>
+
+        <!-- Estado vacío (cuando no hay resultados de búsqueda) -->
+        <div id="emptyState" class="hidden bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center my-6">
+            <div class="w-14 h-14 bg-cosapi-light text-cosapi-blue rounded-full flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="folder-search" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">No se encontraron formularios</h3>
+            <p class="text-sm text-gray-500 max-w-md mx-auto mt-1">
+                No hay formularios que coincidan con tu búsqueda o filtro actual. Intenta con otros términos o agrega un nuevo formulario.
+            </p>
+            <button onclick="resetFilters()" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-cosapi-blue hover:text-cosapi-dark">
+                <i data-lucide="filter-x" class="w-4 h-4"></i>
+                Limpiar filtros
+            </button>
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cosapi-blue"></span>
+                <span class="font-semibold text-gray-700">COSAPI S.A.</span>
+                <span>— Plataforma de Acceso Rápido a Registros SSOMA</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-medium">
+                <span>Nuestra meta:</span>
+                <span class="font-extrabold text-cosapi-blue">CER<span class="text-cosapi-red">O</span> ACCIDENTES</span>
+                <span class="text-gray-700">con INTEGRIDAD</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: AGREGAR / EDITAR FORMULARIO Y VISTA PREVIA QR EN TIEMPO REAL -->
+    <!-- ===================================================================== -->
+    <div id="formModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 my-auto">
+            <!-- Cabecera del Modal -->
+            <div class="bg-gradient-to-r from-cosapi-dark to-cosapi-blue px-6 py-4 flex items-center justify-between text-white">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="qr-code" class="w-5 h-5"></i>
+                    <h2 id="modalTitle" class="font-bold text-lg">Agregar Nuevo Formulario</h2>
+                </div>
+                <button onclick="closeFormModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Formulario -->
+            <form id="itemForm" onsubmit="saveFormItem(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editItemId">
+
+                <div>
+                    <label for="itemTitle" class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                        Título del Formulario <span class="text-cosapi-red">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="itemTitle" 
+                        required 
+                        placeholder="Ej: Inspección Pre-Uso de Equipos"
+                        class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-800 focus:outline-none focus:bg-white focus:border-cosapi-blue focus:ring-2 focus:ring-cosapi-blue/20"
+                    >
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="itemCategory" class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                            Apartado / Categoría <span class="text-cosapi-red">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="itemCategory" 
+                            list="categorySuggestions"
+                            required 
+                            placeholder="Ej: Inspecciones"
+                            class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-800 focus:outline-none focus:bg-white focus:border-cosapi-blue focus:ring-2 focus:ring-cosapi-blue/20"
+                        >
+                        <datalist id="categorySuggestions">
+                            <option value="Inspecciones">
+                            <option value="Operaciones">
+                            <option value="Registros">
+                            <option value="Reportes">
+                            <option value="Check List">
+                            <option value="Gestión SSOMA">
+                            <option value="Capacitación">
+                            <option value="Emergencias">
+                        </datalist>
+                    </div>
+
+                    <div>
+                        <label for="itemUrl" class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                            Enlace / URL del Formulario <span class="text-cosapi-red">*</span>
+                        </label>
+                        <input 
+                            type="url" 
+                            id="itemUrl" 
+                            required 
+                            oninput="updateLiveQrPreview()"
+                            placeholder="https://forms.gle/..."
+                            class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-800 focus:outline-none focus:bg-white focus:border-cosapi-blue focus:ring-2 focus:ring-cosapi-blue/20"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label for="itemDesc" class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                        Descripción Breve (Opcional)
+                    </label>
+                    <textarea 
+                        id="itemDesc" 
+                        rows="2" 
+                        placeholder="Indique brevemente cuándo o quién debe llenar este formulario..."
+                        class="w-full px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-800 focus:outline-none focus:bg-white focus:border-cosapi-blue focus:ring-2 focus:ring-cosapi-blue/20"
+                    ></textarea>
+                </div>
+
+                <!-- Vista previa en vivo del QR -->
+                <div class="bg-cosapi-bg rounded-xl p-3.5 border border-gray-200 flex items-center gap-4">
+                    <div class="bg-white p-2 rounded-lg border border-gray-200 shadow-xs shrink-0 flex items-center justify-center w-[92px] h-[92px]">
+                        <div id="liveQrPreview" class="qr-container"></div>
+                    </div>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <p class="font-bold text-gray-800 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            Vista previa de QR funcional
+                        </p>
+                        <p>El código QR se genera automáticamente a partir del enlace ingresado y queda listo para escanear desde cualquier celular en campo.</p>
+                    </div>
+                </div>
+
+                <!-- Botones del Modal -->
+                <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-gray-100">
+                    <button 
+                        type="button" 
+                        onclick="closeFormModal()" 
+                        class="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-cosapi-blue hover:bg-cosapi-dark text-white shadow-sm transition-colors flex items-center gap-2"
+                    >
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span>Guardar Formulario</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: AMPLIAR CÓDIGO QR PARA ESCANEO A DISTANCIA O DESCARGA PNG   -->
+    <!-- ===================================================================== -->
+    <div id="qrZoomModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/70 backdrop-blur-xs p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-gray-100 text-center">
+            <div class="bg-cosapi-dark px-5 py-3.5 flex items-center justify-between text-white">
+                <span id="zoomCategoryBadge" class="text-xs font-bold uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-full">Apartado</span>
+                <button onclick="closeQrZoomModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <h3 id="zoomTitle" class="font-bold text-gray-900 text-lg leading-snug mb-1">Título del Formulario</h3>
+                <p class="text-xs text-gray-500 mb-5">Escanea este código con la cámara de tu celular</p>
+                
+                <!-- Contenedor QR Grande -->
+                <div class="bg-white p-4 rounded-2xl border-2 border-cosapi-blue/30 shadow-inner inline-block mb-4">
+                    <div id="zoomQrContainer" class="qr-container"></div>
+                </div>
+
+                <p id="zoomUrlText" class="text-xs text-cosapi-blue font-mono truncate bg-cosapi-light/60 px-3 py-1.5 rounded-lg mb-5"></p>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button 
+                        onclick="downloadZoomedQr()" 
+                        class="flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs py-2.5 px-3 rounded-xl transition-colors"
+                    >
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Descargar PNG</span>
+                    </button>
+                    <a 
+                        id="zoomDirectLink" 
+                        href="#" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="flex items-center justify-center gap-1.5 bg-cosapi-blue hover:bg-cosapi-dark text-white font-semibold text-xs py-2.5 px-3 rounded-xl transition-colors"
+                    >
+                        <span>Abrir Enlace</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: CONFIRMACIÓN PERSONALIZADA (SIN USAR window.confirm)         -->
+    <!-- ===================================================================== -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 backdrop-blur-xs p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-gray-100">
+            <div class="w-12 h-12 rounded-full bg-red-50 text-cosapi-red flex items-center justify-center mb-4">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <h3 id="confirmTitle" class="text-lg font-bold text-gray-900">¿Confirmar acción?</h3>
+            <p id="confirmMessage" class="text-sm text-gray-600 mt-1.5 mb-6">Esta acción modificará la lista de formularios guardados.</p>
+            <div class="flex items-center justify-end gap-2.5">
+                <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100">
+                    Cancelar
+                </button>
+                <button id="confirmActionBtn" class="px-4 py-2 rounded-xl text-sm font-semibold bg-cosapi-red hover:bg-red-700 text-white shadow-xs">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // =========================================================================
+        // DATOS PREDETERMINADOS (LOS 6 ENLACES PROPORCIONADOS)
+        // =========================================================================
+        const DEFAULT_FORMS = [
+            {
+                id: 'cosapi-form-1',
+                title: 'Formulario 1 - Inspección / Reporte SSOMA',
+                category: 'Inspecciones',
+                url: 'https://forms.gle/yK5kLGEtBnr4RCz36',
+                description: 'Registro digital de inspecciones de seguridad y verificación de estándares en campo.'
+            },
+            {
+                id: 'cosapi-form-2',
+                title: 'Formulario 2 - Control Operacional',
+                category: 'Operaciones',
+                url: 'https://forms.gle/UMjV16vNpHcANi9X9',
+                description: 'Control operacional de actividades críticas y permisos de trabajo seguro.'
+            },
+            {
+                id: 'cosapi-form-3',
+                title: 'Formulario 3 - Registro de Seguridad',
+                category: 'Registros',
+                url: 'https://forms.gle/JXmTqpZd66wbRMEV7',
+                description: 'Registro oficial de participación, charlas de 5 minutos y cumplimiento SSOMA.'
+            },
+            {
+                id: 'cosapi-form-4',
+                title: 'Formulario 4 - Reporte de Actos y Condiciones',
+                category: 'Reportes',
+                url: 'https://forms.gle/5xfmNYqQ43V6WvWS7',
+                description: 'Reporte preventivo de actos y condiciones subestándar para evitar incidentes.'
+            },
+            {
+                id: 'cosapi-form-5',
+                title: 'Formulario 5 - Evaluación / Check List',
+                category: 'Check List',
+                url: 'https://forms.gle/qEdUrAsW5esiwHZx8',
+                description: 'Lista de verificación rápida de equipos, herramientas y áreas de trabajo.'
+            },
+            {
+                id: 'cosapi-form-6',
+                title: 'Formulario 6 - Gestión Ambiental / Salud',
+                category: 'Gestión SSOMA',
+                url: 'https://forms.gle/TRUX3hVqxFxnzCgS9',
+                description: 'Seguimiento de controles ambientales, salud ocupacional y bienestar en obra.'
+            }
+        ];
+
+        const STORAGE_KEY = 'cosapi_ssoma_forms_v1';
+        let formsData = [];
+        let activeCategory = 'Todos';
+        let searchQuery = '';
+        let currentZoomedItem = null;
+
+        // =========================================================================
+        // INICIALIZACIÓN Y PERSISTENCIA
+        // =========================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFormsFromStorage();
+            setupSearchListener();
+            renderApp();
+        });
+
+        function loadFormsFromStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        formsData = parsed;
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error al leer localStorage:', error);
+            }
+            // Si no hay datos guardados, cargar los 6 predeterminados
+            formsData = JSON.parse(JSON.stringify(DEFAULT_FORMS));
+            saveFormsToStorage();
+        }
+
+        function saveFormsToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(formsData));
+            } catch (error) {
+                console.error('Error al guardar en localStorage:', error);
+                showToast('No se pudo guardar en el almacenamiento local', 'error');
+            }
+        }
+
+        // =========================================================================
+        // RENDERIZADO DE PESTAÑAS Y TARJETAS CON CÓDIGO QR COMPACTO
+        // =========================================================================
+        function renderApp() {
+            renderCategoryTabs();
+            renderFormsGrid();
+            lucide.createIcons();
+        }
+
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            // Obtener categorías únicas preservando orden de aparición
+            const categories = ['Todos', ...new Set(formsData.map(item => item.category.trim()).filter(Boolean))];
+            
+            // Si la categoría activa ya no existe, volver a 'Todos'
+            if (!categories.includes(activeCategory)) {
+                activeCategory = 'Todos';
+            }
+
+            tabsContainer.innerHTML = categories.map(cat => {
+                const isActive = cat === activeCategory;
+                const count = cat === 'Todos' 
+                    ? formsData.length 
+                    : formsData.filter(f => f.category.trim() === cat).length;
+
+                return `
+                    <button 
+                        onclick="selectCategory('${escapeHtml(cat)}')"
+                        class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                            isActive 
+                            ? 'bg-cosapi-blue text-white shadow-xs' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200/80'
+                        }"
+                    >
+                        <span>${escapeHtml(cat)}</span>
+                        <span class="text-[11px] px-1.5 py-0.2 rounded-full ${
+                            isActive ? 'bg-white/25 text-white' : 'bg-white text-gray-500'
+                        }">${count}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderFormsGrid() {
+            const grid = document.getElementById('formsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const visibleCountEl = document.getElementById('visibleCount');
+
+            // Filtrar por categoría y búsqueda
+            const filtered = formsData.filter(item => {
+                const matchesCat = activeCategory === 'Todos' || item.category.trim() === activeCategory;
+                const q = searchQuery.toLowerCase();
+                const matchesSearch = !q || 
+                    item.title.toLowerCase().includes(q) || 
+                    item.category.toLowerCase().includes(q) ||
+                    (item.description && item.description.toLowerCase().includes(q));
+                return matchesCat && matchesSearch;
+            });
+
+            visibleCountEl.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            // Construir HTML de las tarjetas
+            grid.innerHTML = filtered.map((item, index) => `
+                <article class="bg-white rounded-2xl border border-gray-200/90 shadow-xs hover:shadow-md hover:border-cosapi-blue/40 transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                    <div>
+                        <!-- Barra superior de tarjeta: Apartado y Botones Editar/Eliminar -->
+                        <div class="px-4 py-3 bg-gray-50/70 border-b border-gray-100 flex items-center justify-between gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-cosapi-light text-cosapi-dark">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cosapi-blue"></span>
+                                ${escapeHtml(item.category)}
+                            </span>
+                            
+                            <div class="flex items-center gap-1">
+                                <button 
+                                    onclick="openFormModal('${item.id}')" 
+                                    title="Editar título, enlace o apartado"
+                                    class="p-1.5 text-gray-500 hover:text-cosapi-blue hover:bg-cosapi-light/70 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button 
+                                    onclick="confirmDeleteForm('${item.id}')" 
+                                    title="Eliminar formulario"
+                                    class="p-1.5 text-gray-400 hover:text-cosapi-red hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cuerpo de la Tarjeta: Info a la izquierda + QR Compacto a la derecha -->
+                        <div class="p-4 sm:p-5 flex items-start justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-gray-900 text-base leading-snug group-hover:text-cosapi-dark transition-colors">
+                                    ${escapeHtml(item.title)}
+                                </h3>
+                                <p class="text-xs text-gray-500 mt-1.5 line-clamp-3 leading-relaxed">
+                                    ${escapeHtml(item.description || 'Acceso directo al formulario digital SSOMA.')}
+                                </p>
+                                <div class="mt-3 flex items-center gap-1.5 text-[11px] text-gray-400 font-mono truncate">
+                                    <i data-lucide="link" class="w-3 h-3 shrink-0 text-cosapi-blue"></i>
+                                    <span class="truncate">${escapeHtml(item.url)}</span>
+                                </div>
+                            </div>
+
+                            <!-- Contenedor de QR Pequeño / Compacto (96x96px) -->
+                            <div class="shrink-0 flex flex-col items-center">
+                                <button 
+                                    onclick="openQrZoomModal('${item.id}')" 
+                                    title="Clic para ampliar el código QR"
+                                    class="p-2 bg-white border border-gray-200 rounded-xl shadow-2xs hover:border-cosapi-blue hover:shadow transition-all cursor-pointer relative group/qr"
+                                >
+                                    <div id="qr-target-${item.id}" class="qr-container w-[88px] h-[88px] flex items-center justify-center"></div>
+                                    <span class="absolute inset-0 bg-cosapi-dark/80 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover/qr:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+                                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                                        Ampliar QR
+                                    </span>
+                                </button>
+                                <span class="text-[10px] font-medium text-gray-400 mt-1">Escanear QR</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pie de Tarjeta: Botón Principal Ingresar + Botón Copiar Enlace -->
+                    <div class="px-4 pb-4 pt-1 flex items-center gap-2">
+                        <a 
+                            href="${escapeHtml(item.url)}" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="flex-1 inline-flex items-center justify-center gap-2 bg-cosapi-blue hover:bg-cosapi-dark text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-2xs transition-colors"
+                        >
+                            <span>Ingresar al Formulario</span>
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </a>
+
+                        <button 
+                            onclick="copyFormLink('${escapeHtml(item.url)}')" 
+                            title="Copiar enlace al portapapeles"
+                            class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors cursor-pointer shrink-0"
+                        >
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+
+            // Generar los códigos QR reales en cada contenedor recién creado
+            filtered.forEach(item => {
+                const qrEl = document.getElementById(`qr-target-${item.id}`);
+                if (qrEl) {
+                    qrEl.innerHTML = '';
+                    try {
+                        new QRCode(qrEl, {
+                            text: item.url,
+                            width: 88,
+                            height: 88,
+                            colorDark: '#0F172A',
+                            colorLight: '#FFFFFF',
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    } catch (e) {
+                        qrEl.innerHTML = '<span class="text-[10px] text-red-500">URL inválida</span>';
+                    }
+                }
+            });
+        }
+
+        // =========================================================================
+        // FILTROS Y BÚSQUEDA
+        // =========================================================================
+        function selectCategory(category) {
+            activeCategory = category;
+            renderApp();
+        }
+
+        function setupSearchListener() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+
+            input.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                clearBtn.classList.toggle('hidden', searchQuery.length === 0);
+                renderFormsGrid();
+                lucide.createIcons();
+            });
+
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+                searchQuery = '';
+                clearBtn.classList.add('hidden');
+                renderFormsGrid();
+                lucide.createIcons();
+            });
+        }
+
+        function resetFilters() {
+            activeCategory = 'Todos';
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderApp();
+        }
+
+        // =========================================================================
+        // GESTIÓN: AGREGAR Y EDITAR FORMULARIOS
+        // =========================================================================
+        function openFormModal(itemId = null) {
+            const modal = document.getElementById('formModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const idInput = document.getElementById('editItemId');
+            const titleInput = document.getElementById('itemTitle');
+            const catInput = document.getElementById('itemCategory');
+            const urlInput = document.getElementById('itemUrl');
+            const descInput = document.getElementById('itemDesc');
+
+            if (itemId) {
+                const item = formsData.find(f => f.id === itemId);
+                if (!item) return;
+                modalTitle.textContent = 'Editar Formulario / QR';
+                idInput.value = item.id;
+                titleInput.value = item.title;
+                catInput.value = item.category;
+                urlInput.value = item.url;
+                descInput.value = item.description || '';
+            } else {
+                modalTitle.textContent = 'Agregar Nuevo Formulario / QR';
+                idInput.value = '';
+                titleInput.value = '';
+                catInput.value = activeCategory !== 'Todos' ? activeCategory : 'Inspecciones';
+                urlInput.value = '';
+                descInput.value = '';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            updateLiveQrPreview();
+            lucide.createIcons();
+            setTimeout(() => titleInput.focus(), 100);
+        }
+
+        function closeFormModal() {
+            const modal = document.getElementById('formModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function updateLiveQrPreview() {
+            const urlValue = document.getElementById('itemUrl').value.trim();
+            const previewContainer = document.getElementById('liveQrPreview');
+            previewContainer.innerHTML = '';
+
+            if (!urlValue) {
+                previewContainer.innerHTML = '<span class="text-[10px] text-gray-400 text-center px-1">Ingresa un enlace</span>';
+                return;
+            }
+
+            try {
+                new QRCode(previewContainer, {
+                    text: urlValue,
+                    width: 76,
+                    height: 76,
+                    colorDark: '#005A8C',
+                    colorLight: '#FFFFFF',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (e) {
+                previewContainer.innerHTML = '<span class="text-[10px] text-red-500">Error QR</span>';
+            }
+        }
+
+        function saveFormItem(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('editItemId').value;
+            const title = document.getElementById('itemTitle').value.trim();
+            const category = document.getElementById('itemCategory').value.trim() || 'General';
+            let url = document.getElementById('itemUrl').value.trim();
+            const description = document.getElementById('itemDesc').value.trim();
+
+            if (!title || !url) return;
+
+            // Asegurar protocolo https:// si el usuario no lo escribió
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+
+            if (id) {
+                // Actualizar existente
+                const index = formsData.findIndex(f => f.id === id);
+                if (index !== -1) {
+                    formsData[index] = { ...formsData[index], title, category, url, description };
+                    showToast('Formulario y código QR actualizados correctamente');
+                }
+            } else {
+                // Crear nuevo
+                const newItem = {
+                    id: 'cosapi-form-' + Date.now(),
+                    title,
+                    category,
+                    url,
+                    description
+                };
+                formsData.push(newItem);
+                activeCategory = category;
+                showToast('Nuevo formulario y QR agregados');
+            }
+
+            saveFormsToStorage();
+            closeFormModal();
+            renderApp();
+        }
+
+        // =========================================================================
+        // AMPLIACIÓN Y DESCARGA DE QR
+        // =========================================================================
+        function openQrZoomModal(itemId) {
+            const item = formsData.find(f => f.id === itemId);
+            if (!item) return;
+
+            currentZoomedItem = item;
+            document.getElementById('zoomCategoryBadge').textContent = item.category;
+            document.getElementById('zoomTitle').textContent = item.title;
+            document.getElementById('zoomUrlText').textContent = item.url;
+            document.getElementById('zoomDirectLink').href = item.url;
+
+            const container = document.getElementById('zoomQrContainer');
+            container.innerHTML = '';
+
+            new QRCode(container, {
+                text: item.url,
+                width: 220,
+                height: 220,
+                colorDark: '#0F172A',
+                colorLight: '#FFFFFF',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const modal = document.getElementById('qrZoomModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeQrZoomModal() {
+            const modal = document.getElementById('qrZoomModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentZoomedItem = null;
+        }
+
+        function downloadZoomedQr() {
+            if (!currentZoomedItem) return;
+            const container = document.getElementById('zoomQrContainer');
+            const canvas = container.querySelector('canvas');
+            const img = container.querySelector('img');
+
+            let dataUrl = '';
+            if (canvas) {
+                dataUrl = canvas.toDataURL('image/png');
+            } else if (img && img.src) {
+                dataUrl = img.src;
+            }
+
+            if (dataUrl) {
+                const link = document.createElement('a');
+                const safeName = currentZoomedItem.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                link.download = `QR_COSAPI_${safeName}.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('Imagen QR descargada en formato PNG');
+            }
+        }
+
+        // =========================================================================
+        // ELIMINACIÓN Y RESTAURACIÓN (CON MODAL PERSONALIZADO)
+        // =========================================================================
+        function confirmDeleteForm(itemId) {
+            const item = formsData.find(f => f.id === itemId);
+            if (!item) return;
+
+            openConfirmModal(
+                '¿Eliminar formulario?',
+                `Se eliminará "${item.title}" y su código QR asociado del portal.`,
+                () => {
+                    formsData = formsData.filter(f => f.id !== itemId);
+                    saveFormsToStorage();
+                    renderApp();
+                    showToast('Formulario eliminado');
+                }
+            );
+        }
+
+        function confirmResetDefaults() {
+            openConfirmModal(
+                '¿Restaurar formularios originales?',
+                'Se volverán a cargar los 6 formularios predeterminados de COSAPI. Los cambios personalizados se reemplazarán.',
+                () => {
+                    formsData = JSON.parse(JSON.stringify(DEFAULT_FORMS));
+                    activeCategory = 'Todos';
+                    saveFormsToStorage();
+                    renderApp();
+                    showToast('Formularios predeterminados restaurados');
+                }
+            );
+        }
+
+        function openConfirmModal(title, message, onConfirmCallback) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            // Clonar botón para limpiar listeners previos
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+            
+            newBtn.addEventListener('click', () => {
+                onConfirmCallback();
+                closeConfirmModal();
+            });
+
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // =========================================================================
+        // UTILIDADES (COPIAR ENLACE, ESCAPE HTML, NOTIFICACIONES)
+        // =========================================================================
+        function copyFormLink(url) {
+            const tempInput = document.createElement('input');
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                showToast('Enlace copiado al portapapeles');
+            } catch (err) {
+                showToast('No se pudo copiar el enlace', 'error');
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'error' ? 'bg-cosapi-red' : 'bg-gray-900';
+            const iconName = type === 'error' ? 'alert-circle' : 'check-circle-2';
+
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-xl shadow-lg text-xs sm:text-sm font-medium flex items-center gap-2.5 toast-enter pointer-events-auto`;
+            toast.innerHTML = `
+                <i data-lucide="${iconName}" class="w-4 h-4 shrink-0 text-cosapi-blue"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.25s ease';
+                setTimeout(() => toast.remove(), 250);
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Cerrar modales al hacer clic fuera del cuadro o presionar Escape
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeFormModal();
+                closeQrZoomModal();
+                closeConfirmModal();
+            }
+        });
+    </script>
+</body>
+</html>
